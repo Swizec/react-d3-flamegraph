@@ -13,8 +13,15 @@ class Demo extends Component {
             <div className="App">
                 <h1>react-d3-flamegraph Demo</h1>
 
-                <svg width={1280} height={720}>
+                <h2>Static flamegraph</h2>
+                <svg width={1280} height={420}>
                     <Flamegraph data={stacks} width={1280} />
+                </svg>
+
+                <h2>Flamegraph with currently not very performant animation</h2>
+
+                <svg width={1280} height={420}>
+                    <Flamegraph data={stacks} width={1280} enableClick />
                 </svg>
             </div>
         );

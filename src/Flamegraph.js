@@ -22,8 +22,7 @@ class FlameRect extends React.Component {
     gRef = React.createRef();
     labelRef = React.createRef();
 
-    // animation disabled for now
-    // onClick = () => this.props.onSelect();
+    onClick = () => this.props.onSelect();
 
     componentDidUpdate() {
         const { width, x, y } = this.props;
@@ -128,6 +127,8 @@ class Flamegraph extends React.Component {
     };
 
     selectChild = index => {
+        if (!this.props.enableClick) return;
+
         const { selectedChild, data } = this.state;
 
         if (selectedChild === index) {
@@ -150,7 +151,7 @@ class Flamegraph extends React.Component {
     };
 
     render() {
-        const { x = 0, y = 0, width, level = 0 } = this.props,
+        const { x = 0, y = 0, width, level = 0, enableClick } = this.props,
             { data, selectedChild } = this.state;
 
         const xScale = scaleLinear()
@@ -182,6 +183,7 @@ class Flamegraph extends React.Component {
                                     y={RowHeight}
                                     width={xScale(d.value)}
                                     level={level + 1}
+                                    enableClick={enableClick}
                                 />
                             )}
                         </React.Fragment>
