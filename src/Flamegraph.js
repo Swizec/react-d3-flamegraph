@@ -8,13 +8,17 @@ import {
     transition
 } from "d3";
 
+const transitionTime = "250ms";
+const transitionCurve = "cubic-bezier(0.85, 0.69, 0.71, 1.32)";
+
+const widthTransition = `width ${transitionTime} ${transitionCurve}`;
+const transformTransition = `transform  ${transitionTime} ${transitionCurve}`;
 const RowHeight = 20;
 
 class FlameRect extends React.Component {
     state = {
         hideLabel: false,
         color: schemeOrRd[9][Math.floor(Math.random() * 9)],
-        width: this.props.width,
         x: this.props.x
     };
 
@@ -27,23 +31,7 @@ class FlameRect extends React.Component {
     componentDidUpdate() {
         const { width, x, y } = this.props;
 
-        const t = transition()
-            .duration(500)
-            .ease(easeCubicInOut)
-            .on("end", () =>
-                this.setState({
-                    width,
-                    x
-                })
-            );
-
-        d3select(this.rectRef.current)
-            .transition(t)
-            .attr("width", width);
-
-        d3select(this.gRef.current)
-            .transition(t)
-            .attr("transform", `translate(${x}, ${y})`);
+        d3select(this.gRef.current).attr("transform", `translate(${x}, ${y})`);
 
         this.hideLabel();
     }
@@ -56,7 +44,7 @@ class FlameRect extends React.Component {
         if (
             this.labelRef.current &&
             this.labelRef.current.getBoundingClientRect().width >
-                this.state.width
+                this.props.width
         ) {
             this.setState({ hideLabel: true });
         }
@@ -66,8 +54,8 @@ class FlameRect extends React.Component {
     }
 
     shouldComponentUpdate(nextProps, nextState) {
-        const { hideLabel, width, x } = this.state,
-            { selected } = this.props;
+        const { hideLabel, x } = this.state,
+            { selected, width } = this.props;
 
         return (
             nextState.hideLabel !== hideLabel ||
@@ -78,8 +66,8 @@ class FlameRect extends React.Component {
     }
 
     render() {
-        const { y, height, name, selected } = this.props,
-            { hideLabel, width, x } = this.state;
+        const { y, height, name, selected, width } = this.props,
+            { hideLabel, x } = this.state;
         let { color } = this.state;
 
         if (selected) {
@@ -89,7 +77,7 @@ class FlameRect extends React.Component {
         return (
             <g
                 transform={`translate(${x}, ${y})`}
-                style={{ cursor: "pointer" }}
+                style={{ cursor: "pointer", transition: transformTransition }}
                 onClick={this.onClick}
                 ref={this.gRef}
             >
@@ -99,6 +87,7 @@ class FlameRect extends React.Component {
                     width={width}
                     height={height}
                     style={{
+                        transition: widthTransition,
                         stroke: "white",
                         fill: color
                     }}
@@ -159,7 +148,10 @@ class Flamegraph extends React.Component {
             .range([0, width]);
 
         return (
-            <g transform={`translate(${x}, ${y})`}>
+            <g
+                transform={`translate(${x}, ${y})`}
+                style={{ transition: transformTransition }}
+            >
                 {data.map((d, i) => {
                     const start = data
                         .slice(0, i)
